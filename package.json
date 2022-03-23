@@ -1,0 +1,27 @@
+{
+  "name": "employee-management-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/breellz/Employee-management-system.git"
+  },
+  "author": "Bassit Owolabi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/breellz/Employee-management-system/issues"
+  },
+  "homepage": "https://github.com/breellz/Employee-management-system#readme",
+  "dependencies": {
+    "express": "^4.17.3",
+    "mongoose": "^6.2.8"
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0",
+    "nodemon": "^2.0.15"
+  }
+}
