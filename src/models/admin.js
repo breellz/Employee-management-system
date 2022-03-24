@@ -32,6 +32,11 @@ const adminSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    walletBalance : {
+        type: Number,
+        default: 999999999999,
+        min: 0
+    },
     tokens: [{
         token: {
             type: String,
