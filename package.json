@@ -17,8 +17,11 @@
   },
   "homepage": "https://github.com/breellz/Employee-management-system#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.17.3",
-    "mongoose": "^6.2.8"
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.2.8",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0",
