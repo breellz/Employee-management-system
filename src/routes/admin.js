@@ -80,6 +80,45 @@ router.post('/admin/logoutAll', adminAuth, async (req, res) => {
 })
 
 
+//fetch all users
+
+router.get('/admin/users', adminAuth, async(req, res ) => {
+    try {
+        const users = await User.find({})
+        res.send({users})
+    } catch (error) {
+        res.status(400).send()
+    }
+})
+
+//update user details
+
+router.patch('/admin/users/:id', adminAuth, async(req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = [ 'fullName', 'email', 'walletBalance']
+
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if(!isValidOperation) {
+        return res.status(400).send({ error: 'invalid updates'})
+    }
+
+    try {
+        const user = await User.findOne({ _id: req.params.id })
+    
+        if(!user){
+            return res.status(404).send()
+        }
+
+        updates.forEach((update) => user[update] = req.body[update])
+        await user.save()
+        res.send(user)
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
+
+
 //delete user 
 router.delete('/admin/users/:userId', adminAuth, async (req, res) => {
     try {
