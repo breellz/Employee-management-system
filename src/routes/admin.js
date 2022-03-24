@@ -91,7 +91,7 @@ router.get('/admin/users', adminAuth, async(req, res ) => {
     }
 })
 
-//update user details
+//update employee details
 
 router.patch('/admin/users/:id', adminAuth, async(req, res) => {
     const updates = Object.keys(req.body)
@@ -119,7 +119,7 @@ router.patch('/admin/users/:id', adminAuth, async(req, res) => {
 })
 
 
-//delete user 
+//delete employee 
 router.delete('/admin/users/:userId', adminAuth, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.userId })
@@ -129,6 +129,7 @@ router.delete('/admin/users/:userId', adminAuth, async (req, res) => {
         await user.remove()
         res.send(user)
     } catch (error) {
+        console.log(error)
         res.status(400).send(error)
     }
 })
