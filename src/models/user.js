@@ -67,7 +67,7 @@ userSchema.methods.toJSON = function () {
 //Generate auth token
 userSchema.methods.generateAuthToken = async function () {
     const user = this
-    const token = jwt.sign({ _id: user._id.toString()}, 'bankingapi')
+    const token = jwt.sign({ _id: user._id.toString()}, 'employeemanagement0976r')
     user.tokens = user.tokens.concat({token})
      await user.save()
     return token
@@ -78,10 +78,6 @@ userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email })
     if (!user) {
         throw new Error('Email is not registered')
-    }
-    //check if user account is isDisabled and restrict access
-    if(user.isDisabled === true) {
-        throw new Error('Your account is disabled, please contact support for further assistance')
     }
     const isMatch = await bcrypt.compare(password, user.password)
     if(!isMatch) {

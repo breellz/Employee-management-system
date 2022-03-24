@@ -4,38 +4,43 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 const adminSchema = new mongoose.Schema({
+    fullName: {
+        type: String,
+        required: true,
+        trim: true,
+        unique:true,
+        lowercase: true
+    },
     email: {
         type: String,
         required: true,
         unique: true,
         lowercase: true,
         validate( value ) {
-            if(!validator.isEmail(value)) {
-                throw new Error( 'Invalid email')
-            }
-        }
-
-    },
-
-    password: {
-        type: String,
-        required: true,
-        lowercase: true,
-        minLength: 7,
-        validate(value) {
-            if( value.toLowerCase().includes('password')) {
-                throw new Error('password musn\'t contain password')
+            if( !validator.isEmail( value )) {
+                throw new Error( 'Email is invalid' )
             }
         }
     },
     isAdmin: {
         type: Boolean,
-        default: true
+        default: true,
     },
     walletBalance : {
         type: Number,
-        default: 999999999999,
+        default: 999999999999999,
         min: 0
+    },
+    password: {
+        type: String,
+        required: true,
+        minLength: 7,
+        trim: true,
+        validate(value) {
+            if( value.toLowerCase().includes('password')) {
+                throw new Error('password musn\'t contain password')
+            }
+        }
     },
     tokens: [{
         token: {
@@ -43,7 +48,6 @@ const adminSchema = new mongoose.Schema({
             required: true
         }
     }]
-
 }, {
     timestamps: true
 })
@@ -51,7 +55,7 @@ const adminSchema = new mongoose.Schema({
 //Generate auth token
 adminSchema.methods.generateAuthToken = async function () {
     const admin = this
-    const token = jwt.sign({ _id: admin._id.toString()}, 'bankingapi')
+    const token = jwt.sign({ _id: admin._id.toString()}, 'emplo8576yee')
     admin.tokens = admin.tokens.concat({token})
      await admin.save()
     return token
@@ -93,4 +97,5 @@ adminSchema.methods.toJSON = function () {
 
 
 const Admin = mongoose.model('Admin', adminSchema)
+
 module.exports = Admin
