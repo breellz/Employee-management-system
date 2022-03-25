@@ -1,4 +1,6 @@
 const express = require('express')
+const mongoose = require('mongoose');
+const ObjectID = mongoose.Types.ObjectId
 const Admin = require('../models/admin')
 const adminAuth = require('../middleware/adminAuth')
 const User = require('../models/user')
@@ -43,7 +45,7 @@ router.post('/admin/users', validationRules(), validate, adminAuth, async (req, 
 
 //login administrator account
 
-router.post('/admin/login',  validationRules(), validate, async (req, res) => {
+router.post('/admin/login', validationRules(), validate, async (req, res) => {
     try {
         const admin = await Admin.findByCredentials(req.body.email, req.body.password)
         const token = await admin.generateAuthToken()
@@ -82,10 +84,10 @@ router.post('/admin/logoutAll', adminAuth, async (req, res) => {
 
 //fetch all users
 
-router.get('/admin/users', adminAuth, async(req, res ) => {
+router.get('/admin/users', adminAuth, async (req, res) => {
     try {
         const users = await User.find({})
-        res.send({users})
+        res.send({ users })
     } catch (error) {
         res.status(400).send()
     }
@@ -93,20 +95,20 @@ router.get('/admin/users', adminAuth, async(req, res ) => {
 
 //update employee details
 
-router.patch('/admin/users/:id', adminAuth, async(req, res) => {
+router.patch('/admin/users/:id', adminAuth, async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = [ 'fullName', 'email', 'walletBalance', 'role']
+    const allowedUpdates = ['fullName', 'email', 'walletBalance', 'role']
 
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
-    if(!isValidOperation) {
-        return res.status(400).send({ error: 'invalid updates'})
+    if (!isValidOperation) {
+        return res.status(400).send({ error: 'invalid updates' })
     }
 
     try {
         const user = await User.findOne({ _id: req.params.id })
-    
-        if(!user){
+
+        if (!user) {
             return res.status(404).send()
         }
 
@@ -122,17 +124,18 @@ router.patch('/admin/users/:id', adminAuth, async(req, res) => {
 router.post('/admin/payment/users/:id', adminAuth, async (req, res) => {
     try {
         const { amount, description } = req.body
-        if(!amount || typeof(amount) === 'string') {
-            return res.status(400).send({error: "Amount to be paid must be specified and of type number"})
+        if (!amount || typeof (amount) === 'string') {
+            return res.status(400).send({ error: "Amount to be paid must be specified and of type number" })
         }
-        const user = await User.findOne({ _id: req.params.id})
+        const user = await User.findOne({ _id: req.params.id })
         if (!user) {
-            return res.status(404).send({ error: 'User not found'})
+            return res.status(404).send({ error: 'User not found' })
         }
         req.admin.walletBalance -= amount
         user.walletBalance += amount
+        await req.admin.save()
         await user.save()
-        const transaction = new Transaction({ 
+        const transaction = new Transaction({
             paidTo: user._id,
             paidBy: req.admin._id,
             amount,
@@ -140,7 +143,39 @@ router.post('/admin/payment/users/:id', adminAuth, async (req, res) => {
         })
         await transaction.save()
         res.status(201).send({ user, transaction })
-        
+
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+})
+
+//pay multiple employees
+
+router.post('/admin/payment/users', adminAuth, async (req, res) => {
+    try {
+        const payload = req.body
+        const usersNotFound = []
+        const usersWithCompletedPayments = []
+        for (let i = 0; i < payload.length; i++) {
+            const user = await User.findOne({ _id: new ObjectID(payload[i].userid) })
+            if(!user) {
+                 usersNotFound.push(payload[i].userid)
+                 continue
+            }
+            req.admin.walletBalance -= payload[i].amount
+            user.walletBalance += payload[i].amount
+            await req.admin.save()
+            await user.save()
+            const transaction = new Transaction({
+                paidTo: user._id,
+                paidBy: req.admin._id,
+                amount: payload[i].amount,
+                description: payload[i].description
+            })
+            await transaction.save()
+            usersWithCompletedPayments.push(user)
+        }
+        res.send({ usersWithCompletedPayments, usersNotFound})
     } catch (error) {
         res.status(400).send(error.message)
     }
@@ -150,8 +185,8 @@ router.post('/admin/payment/users/:id', adminAuth, async (req, res) => {
 router.delete('/admin/users/:userId', adminAuth, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.userId })
-        if(!user) {
-            return res.status(400).send({message: 'User not found'})
+        if (!user) {
+            return res.status(400).send({ message: 'User not found' })
         }
         await user.remove()
         res.send(user)
