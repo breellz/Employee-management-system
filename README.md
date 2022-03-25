@@ -18,7 +18,6 @@ Please refer to this guide to set up mongoDB on your local machine.
 Documentation can be found here:
 https://documenter.getpostman.com/view/11784799/UVyn1JLx
 
-Deployed here:
 
 Local Server url:
 localhost:5000
