@@ -2,6 +2,7 @@ const express = require('express')
 const Admin = require('../models/admin')
 const adminAuth = require('../middleware/adminAuth')
 const User = require('../models/user')
+const Transaction = require('../models/transaction')
 const { validationRules, validate } = require('../middleware/validators/Login')
 
 const router = new express.Router()
@@ -117,6 +118,33 @@ router.patch('/admin/users/:id', adminAuth, async(req, res) => {
     }
 })
 
+//Pay single employee
+router.post('/admin/payment/users/:id', adminAuth, async (req, res) => {
+    try {
+        const { amount, description } = req.body
+        if(!amount || typeof(amount) === 'string') {
+            return res.status(400).send({error: "Amount to be paid must be specified and of type number"})
+        }
+        const user = await User.findOne({ _id: req.params.id})
+        if (!user) {
+            return res.status(404).send({ error: 'User not found'})
+        }
+        req.admin.walletBalance -= amount
+        user.walletBalance += amount
+        await user.save()
+        const transaction = new Transaction({ 
+            paidTo: user._id,
+            paidBy: req.admin._id,
+            amount,
+            description
+        })
+        await transaction.save()
+        res.status(201).send({ user, transaction })
+        
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+})
 
 //delete employee 
 router.delete('/admin/users/:userId', adminAuth, async (req, res) => {
