@@ -4,8 +4,6 @@ STACK
 
 NODEJS, EXPRESS, MONGODB
 
-Please refer to this guide to set up mongoDB on your local machine.
-[MongoDB installation guide](https://www.mongodb.com/docs/guides/server/install/)
 
 1. clone the repo on your local machine
 
@@ -21,6 +19,35 @@ https://documenter.getpostman.com/view/11784799/UVyn1JLx
 
 Local Server url:
 localhost:5000
+
+Database has been prepopulated with 2 administrator and 3 employees accounts. Here are their details
+
+Administrators
+
+fullName : Bassit Owolabi\
+email : barseetbrown@gmail.com\
+password: qwertyuiop
+
+FullName: Habeeb Badmus\
+email: habeeb@gmail.com\
+password: qwertyuiop
+
+Employees
+
+fullName: Eric Chan\
+email: ericchan@gmail.com\
+password: qwertyuiop\
+role: Software Engineer
+
+fullName: Bruce Wayne\
+email: bwayne@gmail.com\
+password: qwertyuiop\
+role: Software Engineer
+
+fullName: Tyler Kincaid\
+email: tcaid@gmail.com\
+password: qwertyuiop\
+role: Software Engineer
 
 Features
 
