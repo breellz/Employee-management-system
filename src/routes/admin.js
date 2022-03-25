@@ -32,9 +32,8 @@ router.post('/admin/users', validationRules(), validate, adminAuth, async (req, 
 
     try {
         await user.save()
-        const token = await user.generateAuthToken()
 
-        res.status(201).send({ user, token })
+        res.status(201).send({ user })
     } catch (error) {
         res.status(400).send(error)
     }
@@ -95,7 +94,7 @@ router.get('/admin/users', adminAuth, async(req, res ) => {
 
 router.patch('/admin/users/:id', adminAuth, async(req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = [ 'fullName', 'email', 'walletBalance']
+    const allowedUpdates = [ 'fullName', 'email', 'walletBalance', 'role']
 
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
